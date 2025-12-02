@@ -1,0 +1,55 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'dex-local'
+    environment: 'development'
+
+# Alertmanager configuration (optional)
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+
+# Load rules once and periodically evaluate them
+rule_files:
+  # - "alerts.yml"
+
+# Scrape configurations
+scrape_configs:
+  # Scrape metrics exporter
+  - job_name: 'dex-metrics'
+    static_configs:
+      - targets: ['metrics-exporter:9091']
+        labels:
+          service: 'metrics-exporter'
+
+  # Scrape Node.js applications
+  - job_name: 'dex-api'
+    static_configs:
+      - targets: ['api:3000']
+        labels:
+          service: 'rest-api'
+
+  - job_name: 'dex-websocket'
+    static_configs:
+      - targets: ['websocket:3001']
+        labels:
+          service: 'websocket-feed'
+
+  # Scrape Sequencer metrics (if exposed)
+  - job_name: 'dex-sequencer'
+    static_configs:
+      - targets: ['sequencer:8080']
+        labels:
+          service: 'sequencer'
+
+  # Redis exporter (if needed)
+  # - job_name: 'redis'
+  #   static_configs:
+  #     - targets: ['redis-exporter:9121']
+
+  # Postgres exporter (if needed)
+  # - job_name: 'postgres'
+  #   static_configs:
+  #     - targets: ['postgres-exporter:9187']
